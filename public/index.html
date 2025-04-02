@@ -1,0 +1,44 @@
+<!-- Parent HTML File (parent.html) -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Parent Page</title>
+</head>
+<body>
+    <h2>Parent</h2>
+    <input type="text" id="parentInput" placeholder="Enter message">
+    <button onclick="sendMessageToChild()">Send to Child</button>
+    
+    <h3>Messages from Child</h3>
+    <table border="1" id="parentTable">
+        <tr><th>Message</th></tr>
+    </table>
+    
+    <iframe id="childFrame" src="http://localhost:5173" width="400" height="300"></iframe>
+
+    <script>
+        const childOrigin = "http://localhost:5173"; // Update this to your actual child app URL
+
+        function sendMessageToChild() {
+            console.info('Trying to send message to the child: ');
+            const input = document.getElementById("parentInput").value;
+            const childFrame = document.getElementById("childFrame").contentWindow;
+            console.info('Message: ', input);
+            console.info('Child: ', childFrame);
+            childFrame.postMessage(input, childOrigin);
+        }
+
+        window.addEventListener("message", (event) => {
+            if (event.origin !== childOrigin) return; // Security check
+            if (typeof event.data === "string") {
+                const table = document.getElementById("parentTable");
+                const row = table.insertRow();
+                const cell = row.insertCell();
+                cell.textContent = event.data;
+            }
+        });
+    </script>
+</body>
+</html>
